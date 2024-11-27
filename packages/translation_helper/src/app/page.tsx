@@ -47,6 +47,18 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center p-4 bg-white">
       <div className="w-full max-w-7xl space-y-8">
+        {/* 서비스 헤더 섹션 추가 */}
+        <div className="text-center space-y-4 py-8 border-b">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Excel Line Separator Checker
+          </h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            엑셀 파일 내의 비정상적인 줄 종결자(Line Separator)를 검사하고
+            수정하는 도구입니다. LS(Line Separator), PS(Paragraph Separator)
+            등의 특수 문자를 감지하고 정상적인 줄바꿈으로 변환할 수 있습니다.
+          </p>
+        </div>
+
         {/* 파일 업로드 섹션 */}
         <div className="w-full flex flex-col items-center justify-center space-y-4 py-8">
           <div className={UPLOAD_SECTION_WIDTH}>
