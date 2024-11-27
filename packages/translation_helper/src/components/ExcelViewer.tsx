@@ -51,7 +51,7 @@ export default function ExcelViewer({ sheets }: ExcelViewerProps) {
       {/* 현재 선택된 시트의 데이터 테이블 */}
       <div className="bg-white rounded-lg shadow">
         {currentSheet && currentSheet.data && currentSheet.data.length > 0 ? (
-          <DataTable data={currentSheet.data} />
+          <DataTable data={currentSheet.data} sheetName={currentSheet.name} />
         ) : (
           <div className="p-4 text-center text-gray-500">
             데이터가 없습니다.

@@ -54,10 +54,10 @@ export default function FileUpload({
   };
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full">
       <label
         className={`flex flex-col items-center justify-center w-full h-32 
-          border-2 border-dashed rounded-lg cursor-pointer 
+          border-2 border-dashed rounded-lg cursor-pointer w-[600px]
           ${
             isLoading
               ? "bg-gray-100 cursor-not-allowed"
