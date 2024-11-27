@@ -25,19 +25,19 @@
 
 ## 프로젝트 구조
 
-.
-├── packages
-│ └── translation_helper
-│ ├── public
-│ └── src
-│ ├── app
-│ │ ├── api
-│ │ │ └── upload
-│ │ ├── layout.tsx
-│ │ └── page.tsx
-│ ├── components
-│ ├── types
-│ └── utils
+.  
+├── packages  
+│ └── translation_helper  
+│ ├── public  
+│ └── src  
+│ ├── app  
+│ │ ├── api  
+│ │ │ └── upload  
+│ │ ├── layout.tsx  
+│ │ └── page.tsx  
+│ ├── components  
+│ ├── types  
+│ └── utils  
 └── package.json
 
 ### 개발 서버 설치
