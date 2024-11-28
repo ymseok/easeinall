@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
       // 첫 2줄은 설명이므로 건너뛰고, 3번째 줄을 헤더로 사용
       const headers = rawData[2] || []; // 3번째 줄을 헤더로
-      const dataRows = rawData.slice(3); // 4번째 줄부터 데이터
+      const dataRows = rawData.slice(2); // 4번째 줄부터 데이터
 
       // 데이터를 객체 배열로 변환
       const processedData = dataRows.map((row) => {
