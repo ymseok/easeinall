@@ -15,6 +15,7 @@ export interface UploadResponse {
 
 export interface DataTableProps {
   data: ExcelRow[];
+  sheetName: string;
   itemsPerPage?: number;
 }
 

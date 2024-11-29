@@ -1,11 +1,11 @@
 {
-  "name": "helper",
+  "name": "easeinall",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "web": "yarn workspace @helper/translation_helper dev",
+    "web": "yarn workspace @easeinall/translation_helper dev",
     "build": "yarn workspaces run build",
     "test": "yarn workspaces run test"
   }

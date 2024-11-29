@@ -85,3 +85,4 @@ package-lock.json
 # Optional
 .eslintcache
 .stylelintcache
+.yarn/cache/*
