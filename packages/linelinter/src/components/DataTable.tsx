@@ -19,6 +19,7 @@ export default function DataTable({ data, sheetName }: DataTableProps) {
   const [invalidRows, setInvalidRows] = useState(new Set<number>());
   const [showIssueList, setShowIssueList] = useState(false);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const rowsPerPageOptions = [10, 30, 50];
 
@@ -26,10 +27,16 @@ export default function DataTable({ data, sheetName }: DataTableProps) {
   const tableData =
     data && data.length > 0 ? (data.length === 1 ? data : data.slice(1)) : [];
 
-  const totalPages = Math.ceil(tableData.length / itemsPerPage);
+  const filteredData = tableData.filter((row) =>
+    Object.values(row).some((value) =>
+      String(value).toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentData = tableData.slice(startIndex, endIndex);
+  const currentData = filteredData.slice(startIndex, endIndex);
 
   const getInvalidRowsInfo = () => {
     const invalidRowsInfo: { rowIndex: number; firstColumn: string }[] = [];
@@ -163,6 +170,40 @@ export default function DataTable({ data, sheetName }: DataTableProps) {
 
   return (
     <div className="w-full space-y-4">
+      <div className="flex justify-between items-center">
+        <div className="relative w-64">
+          <input
+            type="text"
+            placeholder="검색..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-gray-500">페이지당 행:</span>
+          <select
+            value={itemsPerPage}
+            onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+            className="border rounded px-2 py-1 text-sm"
+          >
+            {rowsPerPageOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {detectionSummary && (
         <div
           className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md relative"
@@ -257,23 +298,6 @@ export default function DataTable({ data, sheetName }: DataTableProps) {
         </div>
       )}
 
-      <div className="flex justify-end mb-4">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-500">페이지당 행:</span>
-          <select
-            value={itemsPerPage}
-            onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-            className="border rounded px-2 py-1 text-sm"
-          >
-            {rowsPerPageOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
       <div className="overflow-x-auto max-h-[600px] rounded-lg shadow">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-100 sticky top-0 z-10">
@@ -291,28 +315,18 @@ export default function DataTable({ data, sheetName }: DataTableProps) {
           <tbody className="bg-white divide-y divide-gray-200">
             {currentData.map((row, rowIndex) => {
               const actualRowIndex = startIndex + rowIndex;
-              const isInvalidRow = invalidRows.has(actualRowIndex);
 
               return (
-                <tr
-                  key={rowIndex}
-                  className={`${
-                    isInvalidRow ? "bg-red-50" : ""
-                  } hover:bg-gray-50`}
-                >
-                  {Object.values(row).map((value, colIndex) => {
-                    const cellKey = `${actualRowIndex}-${colIndex}`;
+                <tr key={rowIndex} className="hover:bg-gray-50">
+                  {Object.entries(row).map(([key, value], colIndex) => {
+                    const cellKey = `${actualRowIndex}-${key}`;
                     const details = invalidCells.get(cellKey);
 
                     return (
                       <td
                         key={cellKey}
-                        className={`px-6 py-4 text-sm relative ${
-                          details
-                            ? "bg-red-100 group cursor-pointer"
-                            : isInvalidRow
-                            ? "text-red-700"
-                            : "text-gray-500"
+                        className={`px-6 py-4 text-sm ${
+                          details ? "relative" : ""
                         }`}
                       >
                         {details ? (
@@ -320,19 +334,19 @@ export default function DataTable({ data, sheetName }: DataTableProps) {
                             <div
                               className="text-red-700 font-medium break-words"
                               dangerouslySetInnerHTML={{
-                                __html: checkLineSeparators(
-                                  String(value)
-                                ).markedText.replace(
-                                  /\[(?:LS|PS)\]/g,
-                                  (match) =>
-                                    `<span class="inline-block bg-red-200 px-2 py-1 mx-1 rounded text-red-800 font-bold">${match}</span>`
-                                ),
+                                __html: checkLineSeparators(String(value))
+                                  .markedText,
                               }}
                             />
                             <div className="absolute hidden group-hover:block bg-black text-white p-2 rounded text-xs -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap z-10 shadow-lg">
                               <span className="font-medium">발견된 문제:</span>{" "}
                               {details
-                                .map((d) => `${d.name} (위치: ${d.position})`)
+                                .map(
+                                  (d) =>
+                                    `${d.name} (위치: ${
+                                      d.position + 1
+                                    }번째 문자)`
+                                )
                                 .join(", ")}
                             </div>
                           </div>

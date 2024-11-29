@@ -40,7 +40,7 @@ export function checkLineSeparators(text: string) {
     .forEach(({ position, name }) => {
       const before = markedText.slice(0, position);
       const after = markedText.slice(position + 1);
-      markedText = `${before}<span class="bg-red-200 px-1" title="${name}">[${name}]</span>${after}`;
+      markedText = `${before}<span class="inline-block bg-red-200 px-1 py-0.5 mx-0.5 rounded text-red-800 font-bold" title="${name}">[${name}]</span>${after}`;
     });
 
   return {
