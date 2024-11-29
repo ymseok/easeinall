@@ -14,13 +14,11 @@ export default function FileUpload({
   isLoading,
 }: FileUploadProps) {
   const [error, setError] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFile = async (file: File) => {
     setError(null);
-    const file = e.target.files?.[0];
-    if (!file) return;
-
     const formData = new FormData();
     formData.append("file", file);
 
@@ -53,9 +51,51 @@ export default function FileUpload({
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFile(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isLoading) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    if (isLoading) return;
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      if (
+        file.type ===
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+        file.type === "application/vnd.ms-excel"
+      ) {
+        handleFile(file);
+      } else {
+        setError("XLSX 또는 XLS 파일만 업로드 가능합니다.");
+      }
+    }
+  };
+
   return (
     <div className="w-full">
-      <label
+      <div
         className={`flex flex-col items-center justify-center w-full h-32 
           border-2 border-dashed rounded-lg cursor-pointer w-[600px]
           ${
@@ -63,17 +103,30 @@ export default function FileUpload({
               ? "bg-gray-100 cursor-not-allowed"
               : "bg-gray-50 hover:bg-gray-100"
           }
+          ${isDragging ? "border-blue-500 bg-blue-50" : ""}
           ${error ? "border-red-500" : "border-gray-300"}`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onClick={() => !isLoading && fileInputRef.current?.click()}
       >
         <div className="flex flex-col items-center justify-center pt-5 pb-6">
           <Upload
             className={`w-8 h-8 mb-2 ${
-              error ? "text-red-500" : "text-gray-500"
+              error
+                ? "text-red-500"
+                : isDragging
+                ? "text-blue-500"
+                : "text-gray-500"
             }`}
           />
           <p
             className={`mb-2 text-sm ${
-              error ? "text-red-500" : "text-gray-500"
+              error
+                ? "text-red-500"
+                : isDragging
+                ? "text-blue-500"
+                : "text-gray-500"
             }`}
           >
             <span className="font-semibold">Click to upload</span> or drag and
@@ -90,7 +143,7 @@ export default function FileUpload({
           onChange={handleFileChange}
           disabled={isLoading}
         />
-      </label>
+      </div>
     </div>
   );
 }
