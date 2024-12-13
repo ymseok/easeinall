@@ -9,8 +9,17 @@ export interface SeasonPrice {
 }
 
 export interface SettlementData {
-  seasonNumber: number;
-  points: number;
-  mbxPrice: number;
-  calculatedValue: number;
+  no: number;
+  creatorId: string;
+  creatorName: string;
+  walletAddress: string;
+  totalPoints: number;
+  totalMbx: number;
+  earlyBirdMbx: number;
+  earlyBirdPoints: number;
+  incentiveMbx: number;
+  incentivePoints: number;
+  seasonMbx: number;
+  seasonPoints: string;
+  lastUsedSeason: number;
 }

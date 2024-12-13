@@ -132,16 +132,68 @@ function calculateSettlement(
   seasonPrices: SeasonPrice[]
 ): SettlementData[] {
   return data.data.map((row) => {
-    const seasonNumber = Number(row["시즌"]);
-    const points = Number(row["포인트"]);
-    const mbxPrice =
-      seasonPrices.find((sp) => sp.season === seasonNumber)?.price || 0;
+    let remainingPoints = Number(row["포인트(정산신청)"]);
+    const seasons = seasonPrices.sort((a, b) => b.season - a.season);
+    const lastSeasonPrice = seasons[0].price;
+
+    // 인센티브와 사전모집특전 계산 (마지막 시즌 시세 기준)
+    const incentivePoints = Number(row["인센티브"]) || 0;
+    const earlyBirdPoints = Number(row["사전모집 특전"]) || 0;
+    const incentiveMbx =
+      Math.round((incentivePoints / lastSeasonPrice) * 100) / 100;
+    const earlyBirdMbx =
+      Math.round((earlyBirdPoints / lastSeasonPrice) * 100) / 100;
+
+    remainingPoints -= incentivePoints + earlyBirdPoints;
+
+    // 시즌별 포인트 계산
+    let seasonMbx = 0;
+    let lastUsedSeason = 0;
+    const seasonPointsMap = new Map<number, number>();
+
+    for (const season of seasons) {
+      if (remainingPoints <= 0) {
+        // remainingPoints가 0이 된 시점이 마지막으로 수령했던 시즌
+        lastUsedSeason = season.season;
+        break;
+      }
+
+      const pointsToUse = Number(row[`포인트(시즌${season.season})`] || 0);
+
+      if (pointsToUse > 0) {
+        seasonMbx += Math.round((pointsToUse / season.price) * 100) / 100;
+        remainingPoints -= pointsToUse;
+        seasonPointsMap.set(season.season, pointsToUse);
+
+        // 마지막 시즌까지 처리했는데 remainingPoints가 남은 경우
+        if (season === seasons[seasons.length - 1] && remainingPoints > 0) {
+          lastUsedSeason = season.season;
+        }
+      }
+    }
+
+    const totalMbx = seasonMbx + incentiveMbx + earlyBirdMbx;
+
+    // 시즌별 포인트를 문자열로 변환 (시즌3:1000, 시즌2:2000 형식)
+    const seasonPointsString = Array.from(seasonPointsMap.entries())
+      .sort((a, b) => b[0] - a[0]) // 시즌 번호 내림차순 정렬
+      .map(([season, points]) => `시즌${season}:${points}`)
+      .join(", ");
 
     return {
-      seasonNumber,
-      points,
-      mbxPrice,
-      calculatedValue: points * mbxPrice,
+      no: Number(row["no"] || row["NO"] || row["No"] || 0),
+      creatorId: String(row["크리에이터ID"]),
+      creatorName: String(row["크리에이터명"]),
+      walletAddress: String(row["지갑 주소"]),
+      totalPoints: Number(row["포인트(정산신청)"]),
+      totalMbx,
+      earlyBirdMbx,
+      incentiveMbx,
+      seasonMbx,
+      lastUsedSeason,
+      earlyBirdPoints,
+      incentivePoints,
+      seasonPoints: seasonPointsString,
     };
   });
 }
