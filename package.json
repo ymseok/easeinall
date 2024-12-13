@@ -1,12 +1,14 @@
 {
-  "name": "easeinall",
+  "name": "easeitall",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "web": "yarn workspace @easeinall/translation_helper dev",
-    "build": "yarn workspaces run build",
-    "test": "yarn workspaces run test"
-  }
+    "build": "yarn workspace linelinter build && yarn workspace seasonsettlement build",
+    "linelinter": "yarn workspace linelinter dev",
+    "seasonsettlement": "yarn workspace seasonsettlement dev",
+    "test": "yarn workspaces foreach run test"
+  },
+  "packageManager": "yarn@4.5.3"
 }
