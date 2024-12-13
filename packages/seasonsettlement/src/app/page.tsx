@@ -1,9 +1,10 @@
 "use client";
-
 import { useRef, useState } from "react";
 import DataTable from "../components/DataTable";
 import FileUpload from "../components/FileUpload";
-import SeasonPriceForm from "../components/SeasonPriceForm";
+import SeasonPriceForm, {
+  SeasonPriceFormRef,
+} from "../components/SeasonPriceForm";
 import SettlementResult from "../components/SettlementResult";
 import { ExcelData, SeasonPrice, SettlementData } from "../types/index";
 
@@ -13,9 +14,7 @@ export default function Home() {
   const [seasonPrices, setSeasonPrices] = useState<SeasonPrice[]>([]);
   const [settlementData, setSettlementData] = useState<SettlementData[]>([]);
   const [validationError, setValidationError] = useState<string | null>(null);
-  const seasonPriceFormRef = useRef<{ validateAndFocus: () => boolean } | null>(
-    null
-  );
+  const seasonPriceFormRef = useRef<SeasonPriceFormRef>(null);
 
   const handleFileUpload = (data: ExcelData) => {
     setExcelData(data);
