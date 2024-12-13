@@ -82,6 +82,20 @@ export default function Home() {
                 </section>
               )}
 
+              <div className="flex justify-end">
+                <button
+                  onClick={() => {
+                    if (!seasonPriceFormRef.current?.validateAndFocus()) {
+                      return;
+                    }
+                    generateSettlementData();
+                  }}
+                  className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors"
+                >
+                  정산용 데이터 생성
+                </button>
+              </div>
+
               <section className="bg-white p-6 rounded-lg shadow">
                 <h2 className="text-2xl font-bold mb-4">업로드된 데이터</h2>
                 <DataTable data={excelData.data} />
