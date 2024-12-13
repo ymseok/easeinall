@@ -20,7 +20,7 @@ export interface SeasonPriceFormRef {
 }
 
 const SeasonPriceForm = forwardRef<SeasonPriceFormRef, SeasonPriceFormProps>(
-  function SeasonPriceForm({ seasonPrices, onSubmit, onValidationError }, ref) {
+  ({ seasonPrices, onSubmit, onValidationError }, ref) => {
     const [prices, setPrices] = useState<SeasonPrice[]>(seasonPrices);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
