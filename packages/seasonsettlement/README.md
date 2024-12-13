@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Season Settlement System
 
-## Getting Started
+시즌별 포인트 정산 처리를 위한 웹 기반 정산 시스템입니다.
 
-First, run the development server:
+## 시스템 개요
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+이 시스템은 다음과 같은 기능을 제공합니다:
+
+- 다중 시즌 정산 데이터 처리
+- 시즌별 MBX 시세 입력 및 관리
+- 정산용 데이터 자동 생성
+- 엑셀 파일 기반의 데이터 입출력
+
+## 시스템 구성
+
+```
+packages/seasonsettlement/
+├── src/
+│   ├── components/     # UI 컴포넌트
+│   ├── types/         # 타입 정의
+│   ├── utils/         # 유틸리티 함수
+│   └── app/           # 페이지 및 레이아웃
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 실행 환경
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Node.js 18.0.0 이상
+- Yarn 4.x
+- Next.js 14.x
+- TypeScript 5.x
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 시작하기
 
-## Learn More
+1. 개발 서버 실행:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+yarn dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. 빌드:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+yarn build
+```
 
-## Deploy on Vercel
+3. 프로덕션 서버 실행:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+yarn start
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 입력 파일 형식
+
+정산 처리를 위한 엑셀 파일은 다음 형식을 따라야 합니다:
+
+- 시즌 정보가 포함된 헤더
+- 각 행의 포인트 데이터
+- 지원 형식: .xlsx, .xls
+
+## 출력 데이터
+
+시스템은 다음과 같은 정산 데이터를 생성합니다:
+
+- 시즌별 정산 금액
+- MBX 변환 정보
+- 정산 처리 메타데이터
