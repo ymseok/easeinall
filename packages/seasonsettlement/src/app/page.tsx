@@ -72,10 +72,10 @@ export default function Home() {
                   <h2 className="text-2xl font-bold mb-4">MBX 시세</h2>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <SeasonPriceForm
-                      ref={seasonPriceFormRef}
                       seasonPrices={seasonPrices}
                       onSubmit={handlePriceSubmit}
                       onValidationError={handleValidationError}
+                      ref={seasonPriceFormRef}
                     />
                   </div>
                 </section>
