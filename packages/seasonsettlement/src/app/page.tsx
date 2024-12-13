@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import DataTable from "../components/DataTable";
 import FileUpload from "../components/FileUpload";
 import SeasonPriceForm from "../components/SeasonPriceForm";
@@ -12,6 +12,10 @@ export default function Home() {
   const [excelData, setExcelData] = useState<ExcelData | null>(null);
   const [seasonPrices, setSeasonPrices] = useState<SeasonPrice[]>([]);
   const [settlementData, setSettlementData] = useState<SettlementData[]>([]);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const seasonPriceFormRef = useRef<{ validateAndFocus: () => boolean } | null>(
+    null
+  );
 
   const handleFileUpload = (data: ExcelData) => {
     setExcelData(data);
@@ -30,10 +34,21 @@ export default function Home() {
   };
 
   const generateSettlementData = () => {
-    // 정산 데이터 생성 로직
+    // 시즌 가격 입력 폼의 유효성 검사 및 포커스 이동
+    if (!seasonPriceFormRef.current?.validateAndFocus()) {
+      return;
+    }
+
+    // 모든 시즌 가격이 입력된 경우에만 정산 데이터 생성
     const settlement = calculateSettlement(excelData!, seasonPrices);
     setSettlementData(settlement);
     setStep(2);
+  };
+
+  const handleValidationError = (message: string) => {
+    setValidationError(message);
+    // 3초 후 에러 메시지 제거
+    setTimeout(() => setValidationError(null), 3000);
   };
 
   return (
@@ -45,6 +60,12 @@ export default function Home() {
             <FileUpload onUpload={handleFileUpload} />
           </section>
 
+          {validationError && (
+            <div className="fixed top-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-lg">
+              {validationError}
+            </div>
+          )}
+
           {excelData && (
             <>
               {seasonPrices.length > 0 && (
@@ -52,8 +73,10 @@ export default function Home() {
                   <h2 className="text-2xl font-bold mb-4">MBX 시세</h2>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <SeasonPriceForm
+                      ref={seasonPriceFormRef}
                       seasonPrices={seasonPrices}
                       onSubmit={handlePriceSubmit}
+                      onValidationError={handleValidationError}
                     />
                   </div>
                 </section>
@@ -66,9 +89,13 @@ export default function Home() {
 
               <div className="flex justify-end">
                 <button
-                  onClick={generateSettlementData}
+                  onClick={() => {
+                    if (!seasonPriceFormRef.current?.validateAndFocus()) {
+                      return;
+                    }
+                    generateSettlementData();
+                  }}
                   className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors"
-                  disabled={!seasonPrices.every((sp) => sp.price > 0)}
                 >
                   정산용 데이터 생성
                 </button>
