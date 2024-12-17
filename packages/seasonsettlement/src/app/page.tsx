@@ -23,7 +23,8 @@ export default function Home() {
     setSeasonPrices(
       seasons.map((season) => ({
         season,
-        price: 0,
+        mbxPrice: 0,
+        pointPrice: 0,
       }))
     );
   };
@@ -146,16 +147,25 @@ function calculateSettlement(
 ): SettlementData[] {
   return data.data.map((row) => {
     let remainingPoints = Number(row["포인트(정산신청)"]);
-    const seasons = seasonPrices.sort((a, b) => b.season - a.season);
-    const lastSeasonPrice = seasons[0].price;
+    const seasons = [...seasonPrices].sort((a, b) => b.season - a.season);
+    const lastSeasonPrice = seasons[0];
 
     // 인센티브와 사전모집특전 계산 (마지막 시즌 시세 기준)
     const incentivePoints = Number(row["인센티브"]) || 0;
     const earlyBirdPoints = Number(row["사전모집 특전"]) || 0;
+    // MBX 계산 로직 변경
     const incentiveMbx =
-      Math.round((incentivePoints / lastSeasonPrice) * 100) / 100;
+      Math.round(
+        (incentivePoints * lastSeasonPrice.pointPrice) /
+          lastSeasonPrice.mbxPrice /
+          100
+      ) * 100;
     const earlyBirdMbx =
-      Math.round((earlyBirdPoints / lastSeasonPrice) * 100) / 100;
+      Math.round(
+        (earlyBirdPoints * lastSeasonPrice.pointPrice) /
+          lastSeasonPrice.mbxPrice /
+          100
+      ) * 100;
 
     remainingPoints -= incentivePoints + earlyBirdPoints;
 
@@ -174,7 +184,11 @@ function calculateSettlement(
       const pointsToUse = Number(row[`포인트(시즌${season.season})`] || 0);
 
       if (pointsToUse > 0) {
-        seasonMbx += Math.round((pointsToUse / season.price) * 100) / 100;
+        const mbx =
+          Math.round(
+            (pointsToUse * season.pointPrice) / season.mbxPrice / 100
+          ) * 100;
+        seasonMbx += mbx;
         remainingPoints -= pointsToUse;
         seasonPointsMap.set(season.season, pointsToUse);
 

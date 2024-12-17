@@ -5,7 +5,8 @@ export interface ExcelData {
 
 export interface SeasonPrice {
   season: number;
-  price: number;
+  mbxPrice: number;
+  pointPrice: number;
 }
 
 export interface SettlementData {
