@@ -10,5 +10,5 @@
     "seasonsettlement": "yarn workspace seasonsettlement dev",
     "test": "yarn workspaces foreach run test"
   },
-  "packageManager": "yarn@4.5.3"
+  "packageManager": "yarn@3.6.4"
 }
