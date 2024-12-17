@@ -20,8 +20,12 @@ export interface SeasonPriceFormRef {
 }
 
 const SeasonPriceForm = forwardRef<SeasonPriceFormRef, SeasonPriceFormProps>(
-  (props: SeasonPriceFormProps, ref: React.Ref<SeasonPriceFormRef>) => {
-    const { seasonPrices, onSubmit, onValidationError } = props;
+  (
+    { seasonPrices, onSubmit, onValidationError },
+    ref: React.Ref<SeasonPriceFormRef>
+  ) => {
+    //(props: SeasonPriceFormProps, ref: React.Ref<SeasonPriceFormRef>) => {
+    //const { seasonPrices, onSubmit, onValidationError } = props;
     const [prices, setPrices] = useState<SeasonPrice[]>(seasonPrices);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
