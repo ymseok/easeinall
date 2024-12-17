@@ -19,6 +19,25 @@ export default function SettlementResult({
     XLSX.writeFile(wb, `정산결과_${new Date().toISOString()}.xlsx`);
   };
 
+  const summary = data.reduce(
+    (acc, row) => ({
+      totalCreators: acc.totalCreators + 1,
+      totalPoints: acc.totalPoints + (row.totalPoints || 0),
+      totalMbx: acc.totalMbx + (row.totalMbx || 0),
+      totalEarlyBirdMbx: acc.totalEarlyBirdMbx + (row.earlyBirdMbx || 0),
+      totalIncentiveMbx: acc.totalIncentiveMbx + (row.incentiveMbx || 0),
+      totalSeasonMbx: acc.totalSeasonMbx + (row.seasonMbx || 0),
+    }),
+    {
+      totalCreators: 0,
+      totalPoints: 0,
+      totalMbx: 0,
+      totalEarlyBirdMbx: 0,
+      totalIncentiveMbx: 0,
+      totalSeasonMbx: 0,
+    }
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -34,6 +53,48 @@ export default function SettlementResult({
         >
           엑셀 다운로드
         </button>
+      </div>
+
+      <div className="bg-white p-6 rounded-lg shadow mb-6">
+        <h3 className="text-xl font-bold mb-4">정산 요약</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="text-sm text-gray-600">총 지급자 수</div>
+            <div className="text-xl font-bold">
+              {summary.totalCreators.toLocaleString()}명
+            </div>
+          </div>
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="text-sm text-gray-600">총 포인트</div>
+            <div className="text-xl font-bold">
+              {summary.totalPoints.toLocaleString()}
+            </div>
+          </div>
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="text-sm text-gray-600">총 MBX</div>
+            <div className="text-xl font-bold">
+              {summary.totalMbx.toLocaleString()}
+            </div>
+          </div>
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="text-sm text-gray-600">사전모집 MBX</div>
+            <div className="text-xl font-bold">
+              {summary.totalEarlyBirdMbx.toLocaleString()}
+            </div>
+          </div>
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="text-sm text-gray-600">인센티브 MBX</div>
+            <div className="text-xl font-bold">
+              {summary.totalIncentiveMbx.toLocaleString()}
+            </div>
+          </div>
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="text-sm text-gray-600">시즌 MBX</div>
+            <div className="text-xl font-bold">
+              {summary.totalSeasonMbx.toLocaleString()}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow">
