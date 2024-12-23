@@ -153,19 +153,20 @@ function calculateSettlement(
     // 인센티브와 사전모집특전 계산 (마지막 시즌 시세 기준)
     const incentivePoints = Number(row["인센티브"]) || 0;
     const earlyBirdPoints = Number(row["사전모집 특전"]) || 0;
-    // MBX 계산 로직 변경
-    const incentiveMbx =
-      Math.round(
+
+    // MBX 계산 로직 수정 - 소수점 2자리까지 표현, 3자리에서 반올림
+    const incentiveMbx = Number(
+      (
         (incentivePoints * lastSeasonPrice.pointPrice) /
-          lastSeasonPrice.mbxPrice /
-          100
-      ) * 100;
-    const earlyBirdMbx =
-      Math.round(
+        lastSeasonPrice.mbxPrice
+      ).toFixed(2)
+    );
+    const earlyBirdMbx = Number(
+      (
         (earlyBirdPoints * lastSeasonPrice.pointPrice) /
-          lastSeasonPrice.mbxPrice /
-          100
-      ) * 100;
+        lastSeasonPrice.mbxPrice
+      ).toFixed(2)
+    );
 
     remainingPoints -= incentivePoints + earlyBirdPoints;
 
@@ -175,40 +176,24 @@ function calculateSettlement(
     const seasonPointsMap = new Map<number, number>();
 
     for (const season of seasons) {
-      if (remainingPoints <= 0) {
-        // remainingPoints가 0이 된 시점이 마지막으로 수령했던 시즌
-        lastUsedSeason = season.season;
-        break;
-      }
+      if (remainingPoints <= 0) break;
 
       const pointsToUse = Number(row[`포인트(시즌${season.season})`] || 0);
-
       if (pointsToUse > 0) {
-        const mbx =
-          Math.round(
-            (pointsToUse * season.pointPrice) / season.mbxPrice / 100
-          ) * 100;
+        const mbx = Number(
+          ((pointsToUse * season.pointPrice) / season.mbxPrice).toFixed(2)
+        );
         seasonMbx += mbx;
         remainingPoints -= pointsToUse;
         seasonPointsMap.set(season.season, pointsToUse);
-
-        // 마지막 시즌까지 처리했는데 remainingPoints가 남은 경우
-        if (season === seasons[seasons.length - 1] && remainingPoints > 0) {
-          lastUsedSeason = season.season;
-        }
+        lastUsedSeason = season.season;
       }
     }
 
     const totalMbx = seasonMbx + incentiveMbx + earlyBirdMbx;
 
-    // 시즌별 포인트를 문자열로 변환 (시즌3:1000, 시즌2:2000 형식)
-    const seasonPointsString = Array.from(seasonPointsMap.entries())
-      .sort((a, b) => b[0] - a[0]) // 시즌 번호 내림차순 정렬
-      .map(([season, points]) => `시즌${season}:${points}`)
-      .join(", ");
-
     return {
-      no: Number(row["no"] || row["NO"] || row["No"] || 0),
+      no: Number(row["NO"]),
       creatorId: String(row["크리에이터ID"]),
       creatorName: String(row["크리에이터명"]),
       walletAddress: String(row["지갑 주소"]),
@@ -220,7 +205,9 @@ function calculateSettlement(
       lastUsedSeason,
       earlyBirdPoints,
       incentivePoints,
-      seasonPoints: seasonPointsString,
+      seasonPoints: Array.from(seasonPointsMap.entries())
+        .map(([season, points]) => `시즌${season}:${points}`)
+        .join(", "),
     };
   });
 }
